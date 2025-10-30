@@ -1,0 +1,14 @@
+{
+  "name": "postman-tests",
+  "version": "1.0.0",
+  "scripts": {
+    "postman:dev": "newman run postman/collections/your-api.postman_collection.json -e postman/environments/dev.postman_environment.json",
+    "postman:staging": "newman run postman/collections/your-api.postman_collection.json -e postman/environments/staging.postman_environment.template.json",
+    "postman:prod": "newman run postman/collections/your-api.postman_collection.json -e postman/environments/prod.postman_environment.template.json",
+    "postman:report:dev": "newman run postman/collections/your-api.postman_collection.json -e postman/environments/dev.postman_environment.json -r htmlextra --reporter-htmlextra-export postman/report-dev.html"
+  },
+  "devDependencies": {
+    "newman": "^6.1.0",
+    "newman-reporter-htmlextra": "^1.23.0"
+  }
+}
