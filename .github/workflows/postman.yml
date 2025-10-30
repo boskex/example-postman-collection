@@ -1,0 +1,38 @@
+name: Postman CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  newman:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - run: npm i -D newman newman-reporter-htmlextra
+
+      - name: Create prod environment from template
+        env:
+          API_BASE_URL: ${{ secrets.API_BASE_URL }}
+          API_KEY: ${{ secrets.API_KEY }}
+        run: |
+          TEMPLATE=postman/environments/prod.postman_environment.template.json
+          OUT=postman/environments/prod.postman_environment.local.json
+          sed -e "s|{{API_BASE_URL}}|$API_BASE_URL|g" \
+              -e "s|{{API_KEY}}|$API_KEY|g" \
+              "$TEMPLATE" > "$OUT"
+
+      - name: Run Newman (staging)
+        run: npx newman run postman/collections/your-api.postman_collection.json \
+             -e postman/environments/prod.postman_environment.local.json \
+             -r htmlextra --reporter-htmlextra-export postman/report.html
+
+      - name: Upload Newman report
+        uses: actions/upload-artifact@v4
+        with:
+          name: postman-report
+          path: postman/report.html
